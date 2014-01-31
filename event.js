@@ -51,9 +51,9 @@ function playPause () {
     if (result.isPlayer.length <= 0) {
       return false;
     }
-    return chrome.tabs.sendMessage(state.mediaTab,
-    { method: 'playPause' }, function (response) {
-      return alert('playpause came back');
+    return chrome.tabs.sendMessage(state.mediaTab, { method: 'playPause' },
+     function (response) {
+        return alert('playpause came back');
     });
   });
 }
