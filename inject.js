@@ -12,28 +12,35 @@ var injected = injected || (function(){
       else throw new Error('Unknown Youtube player');
     }
     else if ((new RegExp('soundcloud')).test(window.location.host)) {
-      if (document.querySelectorAll('.playControl')[0].length > 0) return 'soundcloud';
+      if (document.querySelectorAll('.playControl').length > 0) return 'soundcloud';
       else throw new Error('Unknown Soundcloud player');
     }
   };
 
+
   methods.playPause = function () {
-    switch (identifyPlayer()) {
+    var player;
+    
+    switch (this.identifyPlayer()) {
       case 'youtube-embed':
-        return document.querySelectorAll('embed')[0].playVideo();
+        player = document.querySelectorAll('embed')[0];
+        return player.getPlayerState() > 1 ? player.playVideo() : player.stopVideo();
+
       case 'youtube-html5':
-        return document.querySelectorAll('video')[0].play();
+        player = document.querySelectorAll('video')[0];
+        return player.paused ? player.play() : player.pause();
+
       case 'soundcloud':
         return document.querySelectorAll('.playControl')[0].click();
     }
   };
 
+
   chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     var data = {};
 
-    if (methods.hasOwnProperty(request.method)) {
+    if (methods.hasOwnProperty(request.method))
       data = methods[request.method]();
-    }
 
     sendResponse({ data: data });
     return true;
@@ -41,5 +48,3 @@ var injected = injected || (function(){
 
   return true;
 })();
-
-// TODO: try to reduce number of DOM queries per action to 1
