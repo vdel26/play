@@ -25,5 +25,5 @@
     "persistent": false
   },
   
-  "permissions": ["<all_urls>", "storage"]
+  "permissions": ["<all_urls>", "storage", "tabs"]
 }
