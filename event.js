@@ -32,7 +32,7 @@ function storeMediaTab (activeInfo) {
   alert('Media tab correctly saved');
   chrome.tabs.update(state.initialTab, {'active': true, 'selected': true});
 
-  
+
   injectScript(state.mediaTab, function (response) {
     chrome.storage.local.set({'isPlayer': response.data}, function () {
       if ('string' === typeof response.data) {
@@ -71,12 +71,15 @@ function browserActionSetUp() {
 // set event listeners
 function initialize () {
   // chrome.browserAction.onClicked.addListener(browserActionSetUp);
-  chrome.commands.onCommand.addListener(onPlayPauseCommand);
-  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.method === 'browserActionSetUp') {
-      browserActionSetUp();
-    }
+  chrome.browserAction.onClicked.addListener(function () {
+    chrome.browserAction.setPopup({popup: 'popup.html'});
   });
+  // chrome.commands.onCommand.addListener(onPlayPauseCommand);
+  // chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  //   if (request.method === 'browserActionSetUp') {
+  //     browserActionSetUp();
+  //   }
+  // });
 }
 
 function cleanUp () {
