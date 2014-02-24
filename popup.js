@@ -1,17 +1,24 @@
 function onButtonClick () {
   // chrome.runtime.sendMessage({ method: 'browserActionSetUp'});
-  // chrome.tabs.query({ currentWindow: true }, createTabList);
+  chrome.runtime.sendMessage({ method: 'playMedia' });
+  console.log('onButtonClick');
 }
 
 function onListItemClick (evt) {
-  var target = evt.target;
+  var target = evt.target,
+      currentLi;
 
   // save selected tab
   chrome.storage.local.set({ currentTabId: target.dataset.id });
 
   // change selected tab
-  document.querySelector('li.current').classList.remove('current');
+  currentLi = document.querySelector('li.current');
+  if (currentLi)
+    currentLi.classList.remove('current');
   target.classList.add('current');
+
+  // inject script in the selected tag
+  chrome.runtime.sendMessage({ method: 'injectInTab' });
 }
 
 function createTabList (tabList, currentTabId) {

@@ -1,17 +1,21 @@
-// avoid conflicts in case this script is injected 
-// multiple times on the same page without reloading
+/**
+* avoid conflicts in case this script is injected
+* multiple times on the same page without reloading
+*/
 var injected = injected || (function(){
 
-  // will contain methods accessible from event script
+  /**
+   * methods accessible from other scripts
+   */
   var methods = {};
 
   methods.identifyPlayer = function () {
-    if ((new RegExp('youtube')).test(window.location.host)) {
+    if (/youtube/.test(window.location.host)) {
       if (document.querySelectorAll('embed').length > 0) return 'youtube-embed';
       else if (document.querySelectorAll('video').length > 0) return 'youtube-html5';
       else throw new Error('Unknown Youtube player');
     }
-    else if ((new RegExp('soundcloud')).test(window.location.host)) {
+    else if (/soundcloud/.test(window.location.host)) {
       if (document.querySelectorAll('.playControl').length > 0) return 'soundcloud';
       else throw new Error('Unknown Soundcloud player');
     }
@@ -20,7 +24,7 @@ var injected = injected || (function(){
 
   methods.playPause = function () {
     var player;
-    
+
     switch (this.identifyPlayer()) {
       case 'youtube-embed':
         player = document.querySelectorAll('embed')[0];

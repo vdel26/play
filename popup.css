@@ -43,6 +43,12 @@ li {
     cursor: pointer;
     font-size: 0.8em;
 }
+li:hover {
+    background-color: #df860a;
+}
+li:first-child {
+    margin-top: 60px;
+}
 li.current {
     color: #df860a;
     padding-left: 25px;
@@ -59,10 +65,4 @@ li.current::before {
     background: #df860a;
     left: 0px;
     margin-top: -10px;
-}
-li:hover {
-    background-color: #df860a;
-}
-li:first-child {
-    margin-top: 60px;
 }
