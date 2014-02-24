@@ -1,21 +1,33 @@
-// keep state in local storage API (chrome.storage.local)
-var state = {
-  initialTab: null,
-  mediaTab:   null,
-  mode:       null // should be isPlayer?
-};
+/**
+ * methods accessible from other scripts
+ */
+var methods = {};
 
-function saveState () {
-  chrome.storage.local.set({ state: state });
+
+/**
+ * Set up all event listeners
+ */
+function initialize () {
+  // chrome.browserAction.onClicked.addListener(browserActionSetUp);
+  chrome.browserAction.onClicked.addListener(function () {
+    chrome.browserAction.setPopup({popup: 'popup.html'});
+  });
+
+  chrome.commands.onCommand.addListener(onPlayPauseCommand);
+
+  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (methods.hasOwnProperty(request.method))
+      return methods[request.method]();
+  });
 }
 
-function getState (callback) {
-  chrome.storage.local.get('state', callback);
-}
 
-// inject content script into media tab
-// send message to activate it (get player and its state)
-// returns a string with the player or throws error
+/**
+ * Inject content script in tab and test if
+ * it contains a valid player
+ * @param  {Number}   mediaTabId
+ * @param  {Function} callback
+ */
 function injectScript (mediaTabId, callback) {
   chrome.tabs.executeScript(mediaTabId, { file: 'inject.js' }, function(){
     chrome.tabs.sendMessage(mediaTabId, { method: 'identifyPlayer' }, callback);
@@ -23,70 +35,49 @@ function injectScript (mediaTabId, callback) {
 }
 
 
-// detect user indicated tab, save it and
-// try to play/pause
-function storeMediaTab (activeInfo) {
-  // save media tab and go back to initial tab
-  state.mediaTab = activeInfo.tabId;
-  chrome.tabs.onActivated.removeListener(storeMediaTab);
-  alert('Media tab correctly saved');
-  chrome.tabs.update(state.initialTab, {'active': true, 'selected': true});
+/**
+ * Inject script in the tab selected by the user
+ * @param  {Function} callback
+ */
+function injectInTab (cb) {
+  chrome.storage.local.get('currentTabId', function (result) {
+    var currentTabId = parseInt(result.currentTabId, 10);
+    if (!currentTabId) return false;
 
-  
-  injectScript(state.mediaTab, function (response) {
-    chrome.storage.local.set({'isPlayer': response.data}, function () {
-      if ('string' === typeof response.data) {
-        playPause();
-      }
-    });
-
-    // chrome.browserAction.onClicked.removeListener(browserActionSetUp);
-    // chrome.browserAction.onClicked.addListener(playPause);
+    injectScript(currentTabId, cb);
   });
 }
 
 
-// browser action click handler once there is a
-// media tab stored
-function playPause () {
-  chrome.storage.local.get('isPlayer', function (result) {
-    if (result.isPlayer.length <= 0) return false;
+function playMedia () {
+  chrome.storage.local.get('currentTabId', function (result) {
+    var currentTabId = parseInt(result.currentTabId, 10);
+    if (!currentTabId) return false;
 
-    return chrome.tabs.sendMessage(state.mediaTab, { method: 'playPause' },
-     function (response) {
-        return alert('playpause came back');
-    });
+    chrome.tabs.sendMessage(currentTabId, { method: 'playPause' },
+      function (response) {
+        if (!response) {
+          // reinject content script and try to play again
+          injectInTab(playMedia);
+        }
+      });
   });
 }
 
 
-// browser action event handler
-function browserActionSetUp() {
-  chrome.tabs.query({ currentWindow: true, active: true }, function (activeTabs) {
-    state.initialTab = activeTabs[0].id;
-    chrome.tabs.onActivated.addListener(storeMediaTab);
-  });
-}
-
-// set event listeners
-function initialize () {
-  // chrome.browserAction.onClicked.addListener(browserActionSetUp);
-  chrome.commands.onCommand.addListener(onPlayPauseCommand);
-  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.method === 'browserActionSetUp') {
-      browserActionSetUp();
-    }
-  });
-}
-
-function cleanUp () {
-  // erase localstorage before shutting down
-}
-
-// keyboard shortcut event handler
+/**
+ * Keyboard shortcut event handler
+ */
 function onPlayPauseCommand(command) {
-  playPause();
+  playMedia();
 }
 
-// on chrome start
+
+methods.injectInTab = injectInTab;
+methods.playMedia = playMedia;
+
+
+/**
+ * Initialize when extension is loaded
+ */
 initialize();

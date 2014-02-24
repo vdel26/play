@@ -6,8 +6,7 @@
   "description": "Control media playing in background tabs.",
 
   "browser_action": {
-    "default_icon": "iconpeek.png",
-    "default_popup": "popup.html"
+    "default_icon": "iconpeek.png"
   },
 
   "commands": {
@@ -24,6 +23,6 @@
     "scripts": ["event.js"],
     "persistent": false
   },
-  
-  "permissions": ["<all_urls>", "storage"]
+
+  "permissions": ["<all_urls>", "storage", "tabs"]
 }

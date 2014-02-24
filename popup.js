@@ -1,7 +1,50 @@
-function onClick () {
-   chrome.runtime.sendMessage({ method: 'browserActionSetUp'});
+function onButtonClick () {
+  // chrome.runtime.sendMessage({ method: 'browserActionSetUp'});
+  chrome.runtime.sendMessage({ method: 'playMedia' });
+  console.log('onButtonClick');
+}
+
+function onListItemClick (evt) {
+  var target = evt.target,
+      currentLi;
+
+  // save selected tab
+  chrome.storage.local.set({ currentTabId: target.dataset.id });
+
+  // change selected tab
+  currentLi = document.querySelector('li.current');
+  if (currentLi)
+    currentLi.classList.remove('current');
+  target.classList.add('current');
+
+  // inject script in the selected tag
+  chrome.runtime.sendMessage({ method: 'injectInTab' });
+}
+
+function createTabList (tabList, currentTabId) {
+  var ul = document.querySelector('ul');
+
+  tabList.forEach(function (tab) {
+    var newItem = document.createElement('li');
+
+    newItem.textContent = tab.title;
+    newItem.dataset.id = tab.id;
+    if (tab.id === currentTabId)
+      newItem.classList.add('current');
+
+    ul.appendChild(newItem);
+  });
+}
+
+function buildList (tabList) {
+  chrome.storage.local.get('currentTabId', function (response) {
+    var currentTabId = parseInt(response.currentTabId, 10) || '';
+    createTabList(tabList, currentTabId);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('button')[0].addEventListener('click', onClick);
+  document.querySelector('button').addEventListener('click', onButtonClick);
+  document.querySelector('ul').addEventListener('click', onListItemClick);
+  chrome.tabs.query({ currentWindow: true }, buildList);
 });
