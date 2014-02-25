@@ -4,6 +4,7 @@ function onButtonClick () {
   console.log('onButtonClick');
 }
 
+
 function onListItemClick (evt) {
   var target = evt.target,
       currentLi;
@@ -21,6 +22,7 @@ function onListItemClick (evt) {
   chrome.runtime.sendMessage({ method: 'injectInTab' });
 }
 
+
 function createTabList (tabList, currentTabId) {
   var ul = document.querySelector('ul');
 
@@ -36,6 +38,7 @@ function createTabList (tabList, currentTabId) {
   });
 }
 
+
 function buildList (tabList) {
   chrome.storage.local.get('currentTabId', function (response) {
     var currentTabId = parseInt(response.currentTabId, 10) || '';
@@ -43,6 +46,10 @@ function buildList (tabList) {
   });
 }
 
+
+/**
+ * Attach listeners and build tab list
+ */
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('button').addEventListener('click', onButtonClick);
   document.querySelector('ul').addEventListener('click', onListItemClick);

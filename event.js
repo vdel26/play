@@ -8,7 +8,6 @@ var methods = {};
  * Set up all event listeners
  */
 function initialize () {
-  // chrome.browserAction.onClicked.addListener(browserActionSetUp);
   chrome.browserAction.onClicked.addListener(function () {
     chrome.browserAction.setPopup({popup: 'popup.html'});
   });
