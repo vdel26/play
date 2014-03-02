@@ -59,4 +59,15 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('button').addEventListener('click', onButtonClick);
   document.querySelector('ul').addEventListener('click', onListItemClick);
   chrome.tabs.query({ currentWindow: true }, buildList);
+
+  // insert Analytics
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-48558460-1']);
+  _gaq.push(['_trackPageview']);
+  var ga = document.createElement('script');
+  ga.type = 'text/javascript';
+  ga.async = true;
+  ga.src = 'https://ssl.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(ga, s);
 });
