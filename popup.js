@@ -7,6 +7,7 @@ function onButtonClick () {
 
 function onListItemClick (evt) {
   var target = evt.target,
+      button = document.querySelector('button'),
       currentLi;
 
   // save selected tab
@@ -17,6 +18,10 @@ function onListItemClick (evt) {
   if (currentLi)
     currentLi.classList.remove('current');
   target.classList.add('current');
+
+  // change message
+  button.innerText = '\u21E7 + alt + P';
+  button.classList.add('playing-message');
 
   // inject script in the selected tag
   chrome.runtime.sendMessage({ method: 'injectInTab' });

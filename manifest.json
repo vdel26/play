@@ -1,12 +1,16 @@
 {
   "manifest_version": 2,
 
-  "name": "play",
-  "version": "0.1",
-  "description": "Control media playing in background tabs.",
-
+  "name": "Play",
+  "version": "0.5",
+  "description": "An extension to control audio or video playing in background tabs.",
+  "icons": {
+    "16": "play_icon_16.png",
+    "48": "play_icon_48.png",
+    "128": "play_icon_128.png"
+  },
   "browser_action": {
-    "default_icon": "iconpeek.png"
+    "default_icon": "play_icon_38.png"
   },
 
   "commands": {
